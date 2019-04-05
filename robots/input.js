@@ -1,6 +1,7 @@
 const readLine = require('readline-sync')
 const state = require('./state.js')
 const Parser = require('rss-parser')
+const imdbScrapper = require('imdb-scrapper')
 
 const TREND_URL = 'https://trends.google.com/trends/trendingsearches/daily/rss?geo=BR'
 
@@ -14,13 +15,17 @@ async function robot() {
   state.save(content)
 
   async function askAndReturnSearchTerm() {
-    const response = readLine.question('Type a Wikipedia search term or G to fetch google trends: ')
-    return (response.toUpperCase() === 'G') ?  await askAndReturnTrend() : response
+    const response = readLine.question('Type a Wikipedia search term or [G] to fetch Google Trends or [I] to fetch IMDb Trends: ')
+    return (response.toUpperCase() === 'G') 
+      ? await askAndReturnTrend('google') 
+      : (response.toUpperCase() === 'I') 
+      ? await askAndReturnTrend('trends')
+      : response
   }
 
-  async function askAndReturnTrend() {
+  async function askAndReturnTrend(source) {
     console.log('Please Wait...')
-    const trends = await getGoogleTrends()
+    const trends = (source === 'google') ? await getGoogleTrends() : await getImdbTrends()
     const choice = readLine.keyInSelect(trends, 'Choose your trend:')
 
     return trends[choice] 
@@ -30,6 +35,12 @@ async function robot() {
     const parser = new Parser()
     const trends = await parser.parseURL(TREND_URL)
     return trends.items.map(({title}) => title)
+  }
+
+  async function getImdbTrends(how_many = 9) {
+    return imdbScrapper
+      .getTrending(how_many)
+      .then(movies => movies.trending.map(movie => movie.name))
   }
 
   function askAndReturnPrefix() {
