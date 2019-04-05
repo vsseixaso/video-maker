@@ -20,8 +20,8 @@
     "algorithmia": "^0.3.10",
     "googleapis": "^39.2.0",
     "readline-sync": "^1.4.9",
+    "rss-parser": "^3.7.0",
     "sbd": "^1.0.15",
-    "selenium-webdriver": "^4.0.0-alpha.1",
     "watson-developer-cloud": "^4.0.1"
   }
 }
