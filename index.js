@@ -7,11 +7,13 @@ const robots = {
 
 async function start() {
   await robots.input()
-  await robots.text()
-  await robots.image()
+  // await robots.text()
+  // await robots.image()
 
   const content = robots.state.load()
   console.dir(content, { depth: null })
+  
+  process.exit(0)
 }
 
 start()
