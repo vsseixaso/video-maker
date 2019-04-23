@@ -1,6 +1,6 @@
 const algorithmia = require('algorithmia')
 const algorithmiaApiKey = require('../credentials/algorithmia.json').apiKey
-const summary = require('lexrank.js')
+const sentenceBoundaryDetection = require('sbd')
 
 const watsonApiKey = require('../credentials/watson-nlu.json').apikey
 const NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js')
@@ -18,7 +18,7 @@ async function robot() {
 
   await fetchContentFromWikipedia(content)
   sanitizeContent(content)
-  await breakContentIntoLexicalRankedSentences(content)
+  breakContentIntoSentences(content)
   limitMaximumSentences(content)
   await fetchKeywordsOfAllSentences(content)
 
@@ -33,7 +33,7 @@ async function robot() {
     })
     const wikipediaContent = wikipediaResponse.get()
     
-    content.sourceContentOriginal = wikipediaContent.summary
+    content.sourceContentOriginal = wikipediaContent.content
   }
 
   function sanitizeContent(content) {
@@ -57,27 +57,15 @@ async function robot() {
     return text.replace(/\((?:\([^()]*\)|[^()])*\)/gm, '').replace(/  /g,' ')
   }
 
-  async function breakContentIntoLexicalRankedSentences(content) {
-    return new Promise((resolve, reject) => {
-      content.sentences = []
+  async function breakContentIntoSentences(content) {
+    content.sentences = []
 
-      summary.lexrank(content.sourceContentSanitized, (error, result) => {
-        if (error) {
-          reject(error)
-          return 
-        }
-
-        sentences = result[0].sort(function(a,b){return b.weight.average - a.weight.average})
-
-        sentences.forEach((sentence) => {
-          content.sentences.push({
-            text: sentence.text,
-            keywords: [],
-            images: []
-          })
-        })
-
-        resolve(sentences)
+    const sentences = sentenceBoundaryDetection.sentences(content.sourceContentSanitized)
+    sentences.forEach(sentence => {
+      content.sentences.push({
+        text: sentence,	
+        keywords: [],	
+        images: []
       })
     })
   }
