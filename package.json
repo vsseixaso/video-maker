@@ -18,12 +18,13 @@
   "homepage": "https://github.com/vsseixaso/video-maker#readme",
   "dependencies": {
     "algorithmia": "^0.3.10",
+    "gm": "^1.23.1",
     "googleapis": "^39.2.0",
     "image-downloader": "^3.4.2",
     "imdb-scrapper": "^2.2.0",
-    "sbd": "^1.0.15",
     "readline-sync": "^1.4.9",
     "rss-parser": "^3.7.0",
+    "sbd": "^1.0.15",
     "watson-developer-cloud": "^4.0.1"
   }
 }
